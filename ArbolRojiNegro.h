@@ -13,6 +13,7 @@ class ArbolRN{
 				char color; /**  */
 				int key; /** llave del nodo*/
 				int /** T */ dato; /** almacena el valor según el tipo de dato (T) */ // tentativo
+				Nodo* hijo[2];
 				
 				Nodo(){ /** constructor por omisión */
 					/** inicializa los valores */
@@ -117,13 +118,13 @@ class ArbolRN{
 				}
 			
 		};
-		
-		Nodo * raiz; // atributo del arbol
+		Nodo* raiz; // atributo del ArbolRN
+		Pila pila;  //atributo de la clase ArbolRN
 		
 	public:
 		friend class Pila;
 		class Iterador{ /** con cuatro punteros */
-			
+			public: 
 			Nodo * bisAbuelo;
 			Nodo * abuelo;
 			Nodo * padre;
@@ -163,6 +164,7 @@ class ArbolRN{
 			}
 			
 		};
+		Iterador iterador; // atributo de la clase ArbolRN
 		
 		
 	
@@ -175,67 +177,67 @@ class ArbolRN{
 		void colorFlip(Nodo * padre){ /** recibe el puntero del nodo padre */
 			int ambos = 0; /** */
 			/** si el hijo izquierdo y el hijo derecho son rojos lo almacena en la variable local */
-			if( ('R' == padre->hijo[IZQ]->getColor()) && ('R' == padre->hijo[DER]->getColor()) ){
+			if( ('R' == iterador.padre->hijo[IZQ]->getColor()) && ('R' == iterador.padre->hijo[DER]->getColor()) ){
 				ambos = 1;
 			}
 
 			if(ambos){ /** si ambos son rojos */
 				/** pinta de Negro los nodos */
-				padre->hijo[IZQ]->setColor('N');
-				padre->hijo[DER]->setColor('N');
-				padre->setColor('R'); /** y el padre se vuelve rojo */
+				iterador.padre->hijo[IZQ]->setColor('N');
+				iterador.padre->hijo[DER]->setColor('N');
+				iterador.padre->setColor('R'); /** y el padre se vuelve rojo */
 			}
 		}
 		
 		void rotacionSimpleIzquierda(){ /** se puede pasar a las siglas RSI */
 		/** rotación de punteros */ /** si debe asignar el hijo derecho del bisAbuelo */
-			abuelo->hijo[DER] = padre->hijo[IZQ]; /** le damos el hijo izquierdo al abuelo */
-			padre->hijo[IZQ] = abuelo; /** el abuelo se vuelve hijo izquierdo del padre */
-			bisAbuelo->hijo[DER] = padre; /** el bisAbuelo toma al nodo de mayor jerarquía */
+			iterador.abuelo->hijo[DER] = iterador.padre->hijo[IZQ]; /** le damos el hijo izquierdo al abuelo */
+			iterador.padre->hijo[IZQ] = iterador.abuelo; /** el abuelo se vuelve hijo izquierdo del padre */
+			iterador.bisAbuelo->hijo[DER] = iterador.padre; /** el bisAbuelo toma al nodo de mayor jerarquía */
 			
 		/** rotación de punteros */ /** si debe asignar el hijo derecho del bisAbuelo */
-			abuelo->hijo[DER] = padre->hijo[IZQ]; /** le damos el hijo izquierdo al abuelo */
-			padre->hijo[IZQ] = abuelo; /** el abuelo se vuelve hijo izquierdo del padre */
-			bisAbuelo->hijo[IZQ] = padre; /** el bisAbuelo toma al nodo de mayor jerarquía */
+			iterador.abuelo->hijo[DER] = iterador.padre->hijo[IZQ]; /** le damos el hijo izquierdo al abuelo */
+			iterador.padre->hijo[IZQ] = iterador.abuelo; /** el abuelo se vuelve hijo izquierdo del padre */
+			iterador.bisAbuelo->hijo[IZQ] = iterador.padre; /** el bisAbuelo toma al nodo de mayor jerarquía */
 			
 		}
 		
 		void rotacionSimpleDerecha(){ /** se puede pasar a las siglas RSD */
 		/** rotación de punteros */ /** si debe asignar el hijo derecho del bisAbuelo */
-			abuelo->hijo[IZQ] = padre->hijo[DER]; /** le damos el hijo izquierdo al abuelo */
-			padre->hijo[DER] = abuelo; /** el abuelo se vuelve hijo izquierdo del padre */
-			bisAbueloPtr->hijo[DER] = padre; /** el bisAbuelo toma al nodo de mayor jerarquía */
+			iterador.abuelo->hijo[IZQ] = iterador.padre->hijo[DER]; /** le damos el hijo izquierdo al abuelo */
+			iterador.padre->hijo[DER] = iterador.abuelo; /** el abuelo se vuelve hijo izquierdo del padre */
+			iterador.bisAbuelo->hijo[DER] = iterador.padre; /** el bisAbuelo toma al nodo de mayor jerarquía */
 			
 		/** rotación de punteros */ /** si debe asignar el hijo derecho del bisAbuelo */
-			abuelo->hijo[IZQ] = padre->hijo[DER]; /** le damos el hijo izquierdo al abuelo */
-			padre->hijo[DER] = abuelo; /** el abuelo se vuelve hijo izquierdo del padre */
-			bisAbueloPtr->hijo[IZQ] = padre; /** el bisAbuelo toma al nodo de mayor jerarquía */
+			iterador.abuelo->hijo[IZQ] = iterador.padre->hijo[DER]; /** le damos el hijo izquierdo al abuelo */
+			iterador.padre->hijo[DER] = iterador.abuelo; /** el abuelo se vuelve hijo izquierdo del padre */
+			iterador.bisAbuelo->hijo[IZQ] = iterador.padre; /** el bisAbuelo toma al nodo de mayor jerarquía */
 		}
 		
 		void rotacionDobleIzquierda(){
 			/** rotación de punteros */ /** si debe asignar el hijo derecho del bisAbuelo */
-			padrePtr->hijo[IZQ] = padre->hijo[IZQ]->hijo[DER]; /** la llave izquierda le da su hijo derecho al padre */
-			hijoLlavePtr->hijo[DER] = padre; /** El iterador tendrá referencia del bisAbueloPtr, abueloPtr, padrePtr, hijoLlavePtr */
+			iterador.padre->hijo[IZQ] = iterador.padre->hijo[IZQ]->hijo[DER]; /** la llave izquierda le da su hijo derecho al padre */
+			iterador.actual->hijo[DER] = iterador.padre; /** El iterador tendrá referencia del bisAbueloPtr, abueloPtr, padrePtr, hijoLlavePtr */
 			// -> actualizar los punteros del iterador 
 			// revisar si se puede quitar ArbolRN::
-			ArbolRN::Iterador iterador->bisAbuelo = abuelo;
+			iterador.bisAbuelo = iterador.abuelo;
 			/** el abuelo es el mismo */
-			padre = hijoLlave; /** el hijo pasa a ser padre */
-			hijoLlave = abuelo->hijo[DER]; /** el primer padre pasa a ser hijo */
+			iterador.padre = iterador.actual; /** el hijo pasa a ser padre */
+			iterador.actual = iterador.abuelo->hijo[DER]; /** el primer padre pasa a ser hijo */
 			rotacionSimpleIzquierda();
 		}
 		
 		void rotacionDobleDerecha(){
 			/** rotación de punteros */ /** si debe asignar el hijo izquierdo del bisAbuelo */
-			padrePtr->hijo[DER] = padre->hijo[DER]->hijo[IZQ]; /** la llave derecha le da su hijo izquierdo al padre */
+			iterador.padre->hijo[DER] = iterador.padre->hijo[DER]->hijo[IZQ]; /** la llave derecha le da su hijo izquierdo al padre */
 			/** El iterador tendrá referencia del bisAbueloPtr, abueloPtr, padrePtr, hijoLlavePtr */
-			hijoLlavePtr->hijo[IZQ] = padre; /** el hijo se hace padre de su padre */ // jajaja...
+			iterador.actual->hijo[IZQ] = iterador.padre; /** el hijo se hace padre de su padre */ // jajaja...
 			// -> actualizar los punteros del iterador 
 			// revisar si se puede quitar ArbolRN::
-			ArbolRN::Iterador iterador->bisAbuelo = abuelo;
+			iterador.bisAbuelo = iterador.abuelo;
 			/** el abuelo es el mismo */
-			padre = hijoLlave; /** el hijo pasa a ser padre */
-			hijoLlave = abuelo->hijo[IZQ]; /** el primer padre pasa a ser hijo */
+			iterador.padre = iterador.actual; /** el hijo pasa a ser padre */
+			iterador.actual = iterador.abuelo->hijo[IZQ]; /** el primer padre pasa a ser hijo */
 			rotacionSimpleDerecha();
 		}
 };
