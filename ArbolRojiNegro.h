@@ -77,6 +77,11 @@ class ArbolRN{
 					_init();
 				}
 				
+				Pila(){
+					buffer = 0;
+					contadorDeNodosAgregados = 0;
+				}
+				
 				~Pila(){
 					if(buffer){
 						for(int i = 0; i < contadorDeNodosAgregados; ++i){
@@ -125,6 +130,7 @@ class ArbolRN{
 		friend class Pila;
 		class Iterador{ /** con cuatro punteros */
 			public: 
+			Pila pila;
 			Nodo * bisAbuelo;
 			Nodo * abuelo;
 			Nodo * padre;
@@ -149,18 +155,23 @@ class ArbolRN{
 				bisAbuelo = abuelo;
 				abuelo = padre;
 				padre = actual; // actual es el hijo
-				actual = Pila::getPtrNodo(Pila::getContadorDeNodos() - 1) ; // baje en el árbolo por tanto el hijo cambio
+				actual = pila.getPtrNodo(pila.getContadorDeNodos() - 1) ; // baje en el árbolo por tanto el hijo cambio
 			}
 			
 			void operator--(){
 				actual = padre; // actual se devuelve una poscision que corresponde al padre
 				padre = abuelo; // padre se devuelve una poscision que corresponde al abuelo
 				abuelo = bisAbuelo; // abuelo se devuelve una poscision que corresponde al bisAbuelo
-				bisAbuelo = Pila::getPtrNodo(Pila::getContadorDeNodos() - 5); //el bisAbuelo se devuelve una posicion que seria el total de Nodos agregados -5 porque la actual era -4
+				bisAbuelo = pila.getPtrNodo(pila.getContadorDeNodos() - 5); //el bisAbuelo se devuelve una posicion que seria el total de Nodos agregados -5 porque la actual era -4
 			}
 			
 			Nodo* operator*(){
 				return actual;
+			}
+			
+			void setPila(Pila& pila){
+				//implementarlo de mejor manera para que no haga una copia a nivel de miembro
+				this->pila = pila;
 			}
 			
 		};
