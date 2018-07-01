@@ -3,192 +3,287 @@
 #ifndef _ArbolRojiNegro
 #define _ArbolRojiNegro
 
+#include <iostream>
+using namespace std;
+
+/** constantes definidas para indicar cual es el hijo izquierdo y el derecho */
 #define IZQ 0
 #define DER 1
 
-class ArbolRN{
-	private:
+class ArbolRN{ /** definición de la clase para hacer el árbol de */
+	/** método friend que imprime los valores en los nodos del árbol de forma recursiva, recibe y devuelve la referencia de un objeto de salida de flujo, junto con la referencia del objeto Arbol	*/
+	friend ostream& operator<<(ostream& salida, ArbolRN& arbol){ /** recibe como parámetro la referencia de un objeto stream y Arbol */
+		if(arbol.raiz){ /** si la raiz tiene un puntero válido a un nodo */
+			/** le indica a la raiz que imprima su valor, de forma recursiva invocará el imprimir del resto de nodos que existan */
+			arbol.raiz->imprimir(salida);
+		}
+		return salida; /** devuelve el objeto ostream */
+	}
 
-		class Nodo{
-			public:
+	private: /** delimitador de alcance privado */
+		class Nodo; /** prototipo de la clase nodo para que el compilador sepa que existirá */
+
+		class Pila{ /** definición de la clase Pila */
+
+			friend class Iterador; /** declaramos la clase Iterador como friend para que pueda acceder al vector de punteros a Nodos,
+			 este vector guarda el camino que está siguiendo el iterador cuando baja por el árbol desde la raíz hasta las hojas*/
+
+			public: /** delimitador de acceso público */
+				Nodo** buffer; /** puntero que almacenará la referencia a un vector de punteros a nodo para guardar el camino
+				por el cual se baja, desde la raíz, por los nodos intermedios hasta las hojas */
+				int contadorDeNodosAgregados; /** contador de Nodos que lleva el control de la cantidad de Nodos agregados durante el camino */
+				int length; /** tamaño base del vector para no pedir muchos campos de más y hacerlo un poco más óptimo */
+				//Iterador iterador;
+
+				/** método que se encarga de inicializar el vector al que apunta buffer en punteros nulos y por lo tanto se establece
+				en 0 la cantidad de nodos que se han agregado, será llamado por los constructores de su clase Pila y por el método limpiarPila */
+				void _init(){ /** no recibe parámetros */
+					if(buffer){ /** si el puntero al vector que sirve como buffer es válido */
+						for(int i = 0; i < length; ++i){ /** recorre la totalidad del vector, desde la primera hasta su última celda */
+							buffer[i] = 0; /** establece el puntero en nulo */
+						}
+					}
+					contadorDeNodosAgregados = 0; /** indica que no se han agregado nodos */
+				}
+
+				/* Constructor con parámetro de la clase Pila, el cual recibe el length del vector (su cantidad de celdas) */
+				Pila(int length){ /** recibe la cantidad de celdas por las que debe estar compuesto el vector */
+					buffer = new Nodo* [length]; /** al puntero buffer le asigno el puntero de la primera celda del vector de punteros a objetos de Nodo */
+					this->length = length; /** almaceno el legth como atributo */
+					_init(); /** invoca al método para inicializar el vector en punteros nulos y el contador de nodos agregados en 0 */
+				}
+
+				/** Constructor por omisión que establece de forma predeterminada un buffer de 100 celdas */
+				Pila(){ /** Constructor sin parámetros */
+					length = 100; /** se asigna un length de 100 por defecto */
+					buffer = new Nodo * [length]; /** el buffer almacena el puntero al vector de punteros a Nodo */
+					contadorDeNodosAgregados = 0; /** el contador de nodos agregados se inicia en 0 */
+				}
+
+				/** el destructor de la clase Pila, limpia el vector de punteros y elimina ese vector, luego le asigna a buffer un puntero nulo */
+				~Pila(){ /** el destructor de la clase Pila */
+					if(buffer){ /** si el puntero hace referencia a un vector que funciona como buffer */
+						for(int i = 0; i < contadorDeNodosAgregados; ++i){ /** recorre el vector hasta la última celda que hace refe */
+							buffer[i] = 0; /** establece el puntero en nulo, quien se encarga de eliminar los nodos es la clase ArbolRN */
+						}
+						delete buffer; /** elimina el vector de punteros */
+						buffer = 0; /** asigna un puntero nulo */
+					}
+				}
+
+				/** el método limpiarPila invoca al método que inicializa en null los punteros del vector y reinicia el contador de elementos agregados, no recibe parámetros */
+				void limpiarPila(){/** no recibe parámetros */
+					_init(); /** invoca al método que inicializa el vector de punteros  */
+					cout << "Se limpio la pila de forma exitosa" << endl;
+				}
+
+				/** el método setLength indica la dimensión  */
+				// void setLength(int length){
+					// this->length = length;
+				// }
+
+				/** función que devuelve el atributo que indica la cantidad de celdas del vector que funciona como buffer */
+				int getLength(){ /** no recibe parámetros */
+					return length; /**  devuelve el atributo length */
+				}
+
+				/** el método agregarALaPila recibe el puntero de un Nodo como parámetro y lo agrega al vector de punteros utilizado como buffer */
+				void agregarALaPila(Nodo* nodo){ /** recibe como parámetro un puntero a Nodo */
+					buffer[contadorDeNodosAgregados++] = nodo; /** agrega el puntero recibido de acuerdo con el contador de nodos */
+					//++iterador;
+				}
+
+				/** función que devuelve el atributo utilizado como contador de Nodos agregados al buffer */
+				int getContadorDeNodos(){ /** no recibe parámetro alguno */
+					return contadorDeNodosAgregados; /** devuelve el valor del atributo "contadorDeNodosAgregados" */
+				}
+
+				/** devuelve el puntero a instancia de Nodo almacenado en la celda cuyo indice es ingresado como parámetro */
+				Nodo * getPtrNodo(int indice){ /** recibe el indice de la celda del vector */
+					Nodo * ptr = 0; /** inicializa el puntero en nulo */
+					/** por medio de la función que verifica que el índice ingresado es una posición válida dentro del vector */
+					if( posValida(indice) ){ /** si la posición es válida */
+						ptr = buffer[indice]; /** devuelva el puntero en dicha celda */
+					}
+					return ptr; /** devuelve el puntero almacenado en la variable local */
+				}
+
+				/** función que devuelve 0 (false) si el indice no está dentro del vector o 1 (true) si es cierto que el indice ingresado corresponde a alguna celda del vector de punteros*/
+				int posValida(int indice){ /** recibe un entero que funciona como índice */
+					int validez = 0; /** inicializamos la variable local que indica la validez del puntero */
+					if(indice>=0 && indice<length){ /** si el indice está entre la primera y última celda (incluyéndolas) es válido */
+						validez = 1; /** indica que la vaidez es verdadera */
+					}
+					else{ /** si el indice no está dentro del rango del vector, lo indica al usuario */
+						cerr << "WARNING: El indice ingresado no es valido\nRango del vector 0 - " << length << endl;
+						cerr << "El indice ingresado es " << indice << endl;
+						cout << "se devuelve un puntero nulo por omision" << endl;
+					}
+					return validez; /** devuelve el valor almacenado en validez */
+				}
+
+				/*void setIterador(Iterador& iterador){
+						this->iterador = iterador;
+				}*/
+
+		};
+
+		class Nodo{ /** definición de la clase Nodo */
+			public: /** todos sus atributos y métodos son públicos */
 				char color; /** almacena el color Rojo o Negro del Nodo (raíz, nodo intermedio u hoja) */
-				int key; /** llave del nodo */
+				int key; /** llave del nodo, número menor entre 2 nodos */
 				int /** T */ dato; /** almacena el valor según el tipo de dato (T) */
 				Nodo* hijo[2]; /** cada nodo tiene máximo 2 hijos */
 
-				Nodo(){ /** constructor por omisión */
-					/** inicializa los valores en */
-					dato = 0;
-					key = 0;
-					color = '\0';
+				Pila pila; /** Se crea una instancia de Pila en el stack, el cual utilizará la instancia de la clase Iterador */
+
+				/** Constructor por omisión que inicializa los atributos numéricos en 0, el caracter en nulo y punteros en nulo también */
+				Nodo(){ /** constructor sin parámetros */
+					/** inicializa los atributos de la clase dato, key, color y los punteros a los hijos izquierdo y derecho en cero o nulo según corresponda. */
+					dato = 0; /** inicializa dato en 0 */
+					key = 0; /** inicializa la llave en 0 */
+					color = '\0'; /** inicializa el caracter del color en nulo */
+					hijo[IZQ] = 0; /** inicializa el puntero al hijo izquierdo en nulo */
+					hijo[DER] = 0; /** inicializa el puntero al hijo derecho en nulo */
 				}
 
-				Nodo(int dato){
-					this->dato = dato;
-					key = dato; //tentativo
-					color = 'N';
+				/** Constructor con párametro que se utiliza para crear una hoja */
+				Nodo(int dato){ /** recibe un dato como parámetro */
+					this->dato = dato; /** asigna como atributo el dato que está entrando */
+					key = dato; // tentativo
+					color = 'N'; /** las hojas siempre son de color negro */
+					 /** las hojas no tienen hijos asi que a los punteros en el vector de hijos se les asigna punteros nulos */
+					hijo[IZQ] = 0; /** inicializacion del puntero al hijo izquierdo en nulo */
+					hijo[DER] = 0; /** inicializacion del puntero al hijo derecho en nulo */
 				}
 
-				Nodo(int key, int NoSeUsa){ /** constructor con parámetros de la clase nodo */  //PUEDE SER QUE NO USEMOS EL PARAMETRO DATO EN ESTE CONSTRUCTOR
-					/** inicializa los valores con los atributos recibidos*/
-					this->key=key;
-					dato = 0;
-					color = 'R';
+				/** Constructor con parámetros que se utiliza para la creación de los nodos intermedios del árbol que solo poseen una llave */
+				Nodo(int key, int NoSeUsa){ /** Constructor con parámetros de la clase nodo */  //PUEDE SER QUE NO USEMOS EL PARAMETRO DATO EN ESTE CONSTRUCTOR
+					/** inicializa el valor del atributo key con el parámetro key recibido */
+					this->key = key;/** asignamos la llave que entra como parámetro */
+					dato = 0; /** como es un nodo intermedio, solo almacena llave, entonces no asignamos dato */
+					color = 'R'; /** las llaves cuando se crean son de color rojo */
+					/** inicializa los punteros a hijo en nulo, los cuales serán asignados posteriormente mediante el método "crearLlave" según corresponda */
+					hijo[IZQ] = 0; /** inicializa el puntero al hijo izquierdo en nulo */
+					hijo[DER] = 0; /** inicializa el puntero al hijo derrecho en nulo */
 				}
 
-				Nodo(Nodo* nodo1, Nodo* nodo2){
-					// en parte tienes razon hay que tomar en cuenta el caso en que pase eso para no meterse aqui y solo agregar una hoja, pero serie en insertar aislando bien las condiciones
-
-					Nodo* menor = nodo1;
-					Nodo* mayor = nodo2;
-
-					if(menor->getKey() > nodo2->getKey()){
-						menor = nodo2;
-						mayor = nodo1;
-					}
-					Nodo* llave = new Nodo(menor->getKey(), 0);
-					llave->hijo[IZQ] = menor;
-					llave->hijo[DER] = mayor;
-				}
-
-
+				/** Destructor de la clase Nodo que se encarga de si existen sus hijos */
 				~Nodo(){
-					for(int i=IZQ; i<=DER ; ++i){
-						if(hijo[i]){
-							delete hijo[i];
+					for(int i=IZQ; i<=DER ; ++i){ /** recorre el hijo izquierdo y el hijo derecho */
+						if(hijo[i]){ /** comprueba si el lado respectivo existe */
+							delete hijo[i]; /**mata al hijo respectivo*/
 						}
 					}
 				}
 
+				/** función para crear el nodo intermedio que según la llave ordenará las hojas con datos */
+				Nodo* crearLlave(Nodo* nodo1, Nodo* nodo2){ /** recibe 2 nodos como parámetro */
+					/** para inicializar los punteros, se toma "nodo1" como menor y "nodo2" como mayor */
+					Nodo* menor = nodo1;/** guarda el puntero del primer nodo */
+					Nodo* mayor = nodo2;/** guarda el puntero del segundo nodo */
+					if(menor->getKey() > nodo2->getKey()){ /** si la llave del nodo indicado como menor en realidad es mayor que el del otro nodo */ /** por medio de esta condicion nos damos cuenta si nuestra suposicion de mayor estaba en lo correcto */
+						/** reasigna de forma contraria el menor y el mayor, asigna los punteros de la forma correcta en este caso */
+						menor = nodo2; /** nodo2 es el menor */
+						mayor = nodo1; /** nodo1 es el mayor */
+					}
+					Nodo* llave = new Nodo(menor->getKey(), 0); /** se llama al constructor del nodo que funciona como llave con el int que no se usa */
+					llave->hijo[IZQ] = menor; /** asigna el menor al hijo izquierdo del nodo llave */
+					llave->hijo[DER] = mayor; /** asigna el mayor al hijo derecho del nodo llave */
+					return llave; /** devuelve el nodo llave */
+				}
+
+				/**metodo que asigna al nodo un color desde afuera, practico para futuro color flip*/
 				void setColor(char color){
-					this->color = color;
+					this->color = color; /**realizacion de la asignacion*/
 				}
-
+				/**metodo que realiza una asignacion de dato desde afuera*/
 				void setDato(int dato){
-					this->dato = dato;
+					this->dato = dato;/**realizacion de la asignacion*/
 				}
-
+				/**metodo que asigna una llave desde afuera*/
 				void setKey(int key){
-					this->key = key;
+					this->key = key;/**realizacion de la asignacion*/
 				}
-
+				/**metodo que nos retorna el color del nodo respectivo*/
 				char getColor(){
-					return color;
+					return color; /**realizacion del retorno */
 				}
-
+				/**nos devuelve el dato que esta guardado en nodo*/
 				int /** T */ getDato(){
-					return dato;
+					return dato;/**realizacion del retorno*/
 				}
-
+				/**metodo que nos devuelve el valor de la llave*/
 				int getKey(){
-					return key;
+					return key;/**retorno del valor de la llave*/
 				}
+				/**metodo que le asigna a la clase nodo la pila con la que esta trabajando el arbol actualmente*/
+				void setPila(Pila& pila){
+					this->pila = pila; /**asignacion, por referencia para que se trabaje con la misma pila*/
+				}
+				/**metodo que inserta de forma recursiva en la posicion indicada */
+				void insertar(int dato, Nodo* nodo1, Nodo* nodo2){
+			  if(this->dato!=dato){ /**condicion que solo agrega si no existe el dato que se va a agregar previamente*/
+					int lado = IZQ; /**asumimos que se va a agregar del lado izquierdo*/
+					if(dato > nodo1->dato){/**si el dato que se esta agregando es mayor que el actual esta condicion nos lleva al lado derecho*/
+						lado = DER; /**asignacion del lado respectivo*/
+					}
+					if(nodo1->hijo[lado]){ /**comprobamos si el nodo existe de ese lado*/
+						pila.agregarALaPila(/*nodo1->hijo[lado]*/nodo1); /**se realiza el agregado a la pila */
+						nodo1->hijo[lado]->insertar(dato,nodo1->hijo[lado], nodo2); /**metodo recursivo que vuelve a llamar al metodo insertar con diferente valor*/
+					}
+					else{
+						hijo[lado] = new Nodo(dato); /**si no existe el hijo lo creamos*/
+					}
+					Nodo* llave = crearLlave(nodo1,nodo2); /**esto crearia la llave y de una vez le asignaria los nodos como hijos*/
+					//pila.buffer[pila.contadorDeNodosAgregados - 2]->hijo[lado] = llave;   //MEJOR IMPLEMENTAR CUANDO YA EL ITERADOR ESTE FUNCIONANDO BIEN
 
-				void insertar(int dato, Nodo* nodo1){  //falta agregar el recursivo para que se siga extendiendo en todo el arbol 
-			  if(this->dato!=dato){
-			  	Nodo* nodo2 = new Nodo(dato);
-					Nodo* llave = new Nodo(nodo1,nodo2); // esto crearia la llave y de una vez le asignaria los nodos como hijos
 					}
 				}
-
+				/**metodo que nos dice si un elemento existe o no dentro del arbol*/
 				int existe(int dato){
-					int esta = 0;
-					if(this->dato!=dato){
-	   				int lado = IZQ;
-						if(dato > this->dato){
-		   				lado = DER;
+					int esta = 0; /**inicializacion de la variable que se va a devolver*/
+					if(this->dato!=dato){ /**condicion que comprueba si ese elemento existe*/
+	   				int lado = IZQ; /**asumimos que vamos a ir hacia el lado izquierdo*/
+						if(dato > this->dato){ /**si el dato es mayor al de este nodo vamos al lado derecho*/
+		   				lado = DER; /**asignacion del lado derecho*/
 	   				}
-	   				if(hijo[lado]){
-		   				esta = hijo[lado]->existe(dato);
+	   				if(hijo[lado]){ /**comprobamos si existe ese lado*/
+		   				esta = hijo[lado]->existe(dato); /**si existe el nodo llamamos denuevo al metodo de forma recursiva */
 	   				}
 					}
-					else {
-						esta = 1;
+					else {/**nos demuestra que el dato si existia*/
+						esta = 1; /**asignacion true de la variable que se retornara*/
 					}
-					return esta;
+					return esta; /**retorno de la variable*/
+				}
+				/**metodo que imprime cada nodo y imprime a sus hijos respectivos*/
+				ostream& imprimir(ostream& salida){
+					if(hijo[0]){ /**preguntamos si el hijo izquierdo existe */
+						hijo[0]->imprimir(salida); /**llama de forma recursiva el metodo imprimir de el hijo izquierdo*/
+					}
+    			salida << "Dato: "<< dato << " Key:" << key << "       "; /**manda a salida el dato y deja un espacio*/
+					if(hijo[1]){ /**pregunta si el hijo derecho existe*/
+						hijo[1]->imprimir(salida); /**llama de forma recursiva el metodo imprimir del hijo derecho*/
+					}
+					return salida; /**retorna el ostream*/
 				}
 		};
 
-		class Pila{
-			friend class Iterador;
-
-			public:
-				Nodo** buffer;
-				int contadorDeNodosAgregados;
-				int length;
-
-				void _init(){
-					for(int i = 0; i < length; ++i){
-						buffer[i] = 0;
-					}
-					contadorDeNodosAgregados = 0;
-				}
-
-				Pila(int length){
-					buffer = new Nodo* [length];
-					this->length = length;
-					_init();
-				}
-
-				Pila(){
-					buffer = 0;
-					contadorDeNodosAgregados = 0;
-				}
-
-				~Pila(){
-					if(buffer){
-						for(int i = 0; i < contadorDeNodosAgregados; ++i){
-							delete buffer[i];
-						}
-						delete buffer;
-						buffer = 0;
-					}
-
-				}
-
-				void limpiarPila(){
-					_init();
-				}
-
-				void agregarALaPila(Nodo* nodo){
-					buffer[contadorDeNodosAgregados] = nodo;
-					++contadorDeNodosAgregados;
-				}
-
-				int getContadorDeNodos(){
-					return contadorDeNodosAgregados;
-				}
-
-				Nodo * getPtrNodo(int indice){
-					Nodo * ptr = 0;
-					if( posValida(indice) ){
-						ptr = buffer[indice];
-					}
-					return ptr;
-				}
-
-				int posValida(int indice){
-					int validez = 0;
-					if(indice>=0 && indice<length){
-						validez = 1;
-					}
-					return validez;
-				}
-
-		};
 		Nodo* raiz; // atributo del ArbolRN
 		Pila pila;  //atributo de la clase ArbolRN
 
 	public:
-		friend class Pila;
+
 		class Iterador{ /** con cuatro punteros */
 			public:
-			Pila pila;
-			Nodo * bisAbuelo;
-			Nodo * abuelo;
-			Nodo * padre;
-			Nodo * actual; /** se toma como nodo hijo, y en base a este, se asignan los nodos padre, abuelo y bisAbuelo */
+			Pila pila; //**instancia de pila dentro de la clase iterador*/
+			Nodo* bisAbuelo; /**puntero a nodo con el que vamos a saber quien es el bisAbuelo  mientras bajamos*/
+			Nodo* abuelo;  /**puntero a nodo con el que vamos a saber quien es el Abuelo  mientras bajamos*/
+			Nodo* padre;  /**puntero a nodo con el que vamos a saber quien es el padre  mientras bajamos*/
+			Nodo* actual; /** se toma como nodo hijo, y en base a este, se asignan los nodos padre, abuelo y bisAbuelo */
 
+			/**inicializacion de todo en nulo*/
 			void _initPtr(){
 				bisAbuelo = 0;
 				abuelo = 0;
@@ -196,10 +291,12 @@ class ArbolRN{
 				actual = 0;
 			}
 
+			/**constructor por omisión de la clase iterador*/
 			Iterador(){
 				_initPtr();
 			}
 
+			/**destructor de iterador el cual no tiene que matar nada porque los nodos los mata el arbol pero es efectivo hacer que cuando se muera sus punteros queden en nulo */
 			~Iterador(){
 				_initPtr();
 			}
@@ -218,25 +315,26 @@ class ArbolRN{
 				bisAbuelo = pila.getPtrNodo(pila.getContadorDeNodos() - 5); //el bisAbuelo se devuelve una posicion que seria el total de Nodos agregados -5 porque la actual era -4
 			}
 
+			/**metodo sobrecaragado del asterisco que retorno al puntero que esta apuntando al actual*/
 			Nodo* operator*(){
-				return actual;
+				return actual; /**retorno del puntero que apunta al actual*/
 			}
-
+			/**metodo que le asigna al iterador la misma pila con al que trabaja el arbol*/
 			void setPila(Pila& pila){
-				//implementarlo de mejor manera para que no haga una copia a nivel de miembro(al rato si este bien ya que planeamos usar la misma pila)
-				this->pila = pila;
+				this->pila = pila; /**asignacion de la pila */
 			}
 
 		};
-		Iterador iterador; // atributo de la clase ArbolRN
 
+		Iterador iterador; /**instancio de iterador que actua como atributo de la clase arbol*/
+		/**metodo constructor por omision de la clase ArbolRN*/
 		ArbolRN(){
-			raiz = 0;
+			raiz = 0; /**inicializacion de la raiz en nulo*/
 		}
-
-		~ArbolRN(){  //hacer destructor de nodo que se llame a sus hijos
-			if (raiz) {
-				delete raiz;
+		/**metodo destructor de arbol que mata a la raiz y esta se encarga de matar a sus hijos*/
+		~ArbolRN(){
+			if (raiz) { /**entra solo si existe la raiz*/
+				delete raiz; /**cada nodo mata recursivamente a sus hijos*/
 			}
 		}
 
@@ -296,7 +394,7 @@ class ArbolRN{
 			/** el abuelo es el mismo */
 			iterador.padre = iterador.actual; /** el hijo pasa a ser padre */
 			iterador.actual = iterador.abuelo->hijo[DER]; /** el primer padre pasa a ser hijo */
-			rotacionSimpleIzquierda();
+			rotacionSimpleIzquierda(); /**llamado al metodo rotacion simple izquierda*/
 		}
 
 		void rotacionDobleDerecha(){
@@ -313,33 +411,58 @@ class ArbolRN{
 			rotacionSimpleDerecha();
 		}
 
-
 		void insertar(int dato){
+
+			Nodo* nodo2 = new Nodo(dato); //esto es lo que acabo de agregar
 		 if(raiz){
-			 raiz->insertar(dato, raiz); //creo que ocupamos psarle tambien la referencio de raiz a este metodo
+			 raiz->setPila(pila);
+			 raiz->insertar(dato, raiz, nodo2); //creo que ocupamos psarle tambien la referencio de raiz a este metodo y el nodo2 tambien se lo estamos pasando por parametro
 		 }
 		 else {
-			 raiz = new Nodo(dato);
+			 raiz = nodo2;
+			 //pila.agregarALaPila(raiz);  aqui creo que no se agrega porque apenas es la primera hoja agregada no se baja
 		 }
+		 cout << "contador de nodos agregados de pila" << pila.contadorDeNodosAgregados << endl;
+		 imprimirPila();
+		 pila.limpiarPila();
 	 }
-
+	 /**metodo existe de arbol que llama recursivamente al de nodo*/
 	int existe(int dato){
-		 int esta = 0;
-		 if(raiz){
-			 esta = raiz->existe(dato);
+		 int esta = 0; /**se asume que no esta*/
+		 if(raiz){/**si existe la raiz entra*/
+			 esta = raiz->existe(dato); /**llamado a el metodo existe de nodo */
 		 }
-		 return esta;
+		 return esta; /**retorna el resultado de si esta o no esta*/
 	 }
 
+	 void imprimirPila(){
+		 for(int i = 0; i < pila.contadorDeNodosAgregados; ++i){
+			 cout << pila.buffer[i];
+		 }
+	 }
+
+
+	//metodo que no se utiliza en este momento pero puede ser que a futuro nos llegue a servir
+	/*void setLengthPila(int length){
+		this->pila.setLength(length);
+	}*/
 
 };
 #endif
 
 //RECORDATORIO
 
+// Pasar el nombre del archivo .h a ArbolRN
+// Cuidado con setLength()
+// ver si Pila tiene un nombre apropiado, por su forma del manejo de datos, podría cambiarse a Buffer
 
-//un metodo que limpia la pila
+// se crea como atributo una instancia de la clase Pila en Nodo paa facilitar el manejo de la misma, preguntar a Casasola
+// si eso es correcto o si debe incluirse solamente donde se interactue con la pila, Nodo no tiene que ver con la Pila, sino alguna clase como iterador
+
+// Ajustar el constructor de Nodo para el árbol roji-negro real, agregar key ¿cierto?
+// El constructor de la llave es la que debe tener un constructor con un sólo parámetro
+
 //el metodo agregar necesita ir llenando la pila conforme va bajando y verificar si hay que hacer color flip o las rotaciones
 //ahorita estamos realizando pruebas con int en general pasar a tipo T despues
-//solo falta agregar constructor de nodo llave a insertar y ir llenando la pila
-//claro y probar los metodos colorFlip y rotaciones...
+//probar los metodos colorFlip y rotaciones...
+//ocupamos implementar el ++ de iterador dentro de nodo ya que ahi se realiza el insertar en la pila, asi que ocupamos pasarle una referencia de iterador
