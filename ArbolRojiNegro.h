@@ -172,7 +172,7 @@ class ArbolRN{ /** definición de la clase para hacer el árbol de */
 				~Nodo(){
 					for(int i=IZQ; i<=DER ; ++i){ /** recorre el hijo izquierdo y el hijo derecho */
 						if(hijo[i]){ /** comprueba si el lado respectivo existe */
-							delete hijo[i]; /**mata al hijo respectivo*/
+							delete hijo[i]; /** devuelve la memoria del hijo respectivo */
 						}
 					}
 				}
@@ -193,50 +193,64 @@ class ArbolRN{ /** definición de la clase para hacer el árbol de */
 					return llave; /** devuelve el nodo llave */
 				}
 
-				/**metodo que asigna al nodo un color desde afuera, practico para futuro color flip*/
-				void setColor(char color){
-					this->color = color; /**realizacion de la asignacion*/
+				/** método que asigna al nodo un color desde dentro o afuera, práctico para el método color-flip */
+				void setColor(char color){ /** recibe el caracter que indica el color rojo o negro */
+					if( (color=='R' || color=='N') || (color=='r' || color=='n') ){ /** si el caracter ingresado hace referencia a el color rojo o negro */
+						this->color = color; /** realiza la asignación */
+					}
+					else{ /** indica al usuario que el caracter ingresado no hace referencia al color rojo, ni negro */
+						cerr << "WARNING: El caracter ingresado \""<<color<<"\" no hace referencia al color rojo (R) o negro (N)" << endl;
+						cerr << "No se ha establecido el color \""<<color<<"\"<< endl;
+					}
 				}
-				/**metodo que realiza una asignacion de dato desde afuera*/
-				void setDato(int dato){
-					this->dato = dato;/**realizacion de la asignacion*/
+			
+				/** método que realiza una asignacion del dato de la instancia de Nodo */
+				void setDato(int dato){ /** recibe un dato de tipo T como parámetro */
+					this->dato = dato; /** asignación del dato */
 				}
-				/**metodo que asigna una llave desde afuera*/
+			
+				/** método que realiza una asignacion de la llave de la instancia de Nodo */
 				void setKey(int key){
-					this->key = key;/**realizacion de la asignacion*/
+					this->key = key; /** asignación de la llave */
 				}
-				/**metodo que nos retorna el color del nodo respectivo*/
+			
+				/** función que retorna el color del nodo respectivo */
 				char getColor(){
-					return color; /**realizacion del retorno */
+					return color; /** retorno de la variable de instancia color */
 				}
-				/**nos devuelve el dato que esta guardado en nodo*/
-				int /** T */ getDato(){
-					return dato;/**realizacion del retorno*/
+			
+				/** función que devuelve el dato que está guardado en el nodo */
+				int /** T */ getDato(){ /** no necesita parámetro */
+					return dato; /** retorna el atributo dato */
 				}
-				/**metodo que nos devuelve el valor de la llave*/
+			
+				/** función que devuelve el valor de la llave */
 				int getKey(){
-					return key;/**retorno del valor de la llave*/
+					return key; /** retorno del valor del atributo llave */
 				}
-				/**metodo que le asigna a la clase nodo la pila con la que esta trabajando el arbol actualmente*/
-				void setPila(Pila& pila){
-					this->pila = pila; /**asignacion, por referencia para que se trabaje con la misma pila*/
+			
+				/** método que le asigna a la clase Nodo el buffer con el que está trabajando el árbol */
+				void setPila(Pila& pila){ /** recibe como parámetro la referencia de la instancia de Pila */
+					this->pila = pila; /** asignación, por referencia para que se trabaje con la misma pila*/ // esta línea está rara
 				}
-				/**metodo que inserta de forma recursiva en la posicion indicada */
-				void insertar(int dato, Nodo* nodo1, Nodo* nodo2){
-			  if(this->dato!=dato){ /**condicion que solo agrega si no existe el dato que se va a agregar previamente*/
-					int lado = IZQ; /**asumimos que se va a agregar del lado izquierdo*/
-					if(dato > nodo1->dato){/**si el dato que se esta agregando es mayor que el actual esta condicion nos lleva al lado derecho*/
-						lado = DER; /**asignacion del lado respectivo*/
-					}
-					if(nodo1->hijo[lado]){ /**comprobamos si el nodo existe de ese lado*/
-						pila.agregarALaPila(/*nodo1->hijo[lado]*/nodo1); /**se realiza el agregado a la pila */
-						nodo1->hijo[lado]->insertar(dato,nodo1->hijo[lado], nodo2); /**metodo recursivo que vuelve a llamar al metodo insertar con diferente valor*/
-					}
-					else{
-						hijo[lado] = new Nodo(dato); /**si no existe el hijo lo creamos*/
-					}
-					Nodo* llave = crearLlave(nodo1,nodo2); /**esto crearia la llave y de una vez le asignaria los nodos como hijos*/
-					//pila.buffer[pila.contadorDeNodosAgregados - 2]->hijo[lado] = llave;   //MEJOR IMPLEMENTAR CUANDO YA EL ITERADOR ESTE FUNCIONANDO BIEN
+			
+				/** método que inserta de forma recursiva en la posicion necesitada */
+				void insertar(int dato, Nodo* nodo1, Nodo* nodo2){ /** recibe un dato de tipo T, y los punteros de 2 nodos */
+			  		if(this->dato != dato){ /** se agrega si el dato recibido como parámetro no se ha agregado previamente */
+						int lado = IZQ; /** se inicializa como para agregar al lado izquierdo del nodo */
+						if(dato > nodo1->dato){/** si el dato que se esta agregando es mayor que el del primer nodo , esta condición lleva al lado derecho si es necesario */
+							lado = DER; /** asignación para trabajar sobre el lado derecho */
+						}
+						if(nodo1->hijo[lado]){ /** si el nodo existe de ese lado */
+							pila.agregarALaPila(/*nodo1->hijo[lado]*/nodo1); /** se agrega a la pila el primer nodo */
+							// hasta aquí legué
+							nodo1->hijo[lado]->insertar(dato,nodo1->hijo[lado], nodo2); /**metodo recursivo que vuelve a llamar al metodo insertar con diferente valor*/
+						}
+						else{ /** si el nodo no existe */
+							hijo[lado] = new Nodo(dato); /** se crea el Nodo */
+						}
+						Nodo* llave = crearLlave(nodo1,nodo2); /**esto crearia la llave y de una vez le asignaria los nodos como hijos*/
+						//pila.buffer[pila.contadorDeNodosAgregados - 2]->hijo[lado] = llave;   //MEJOR IMPLEMENTAR CUANDO YA EL ITERADOR ESTE FUNCIONANDO BIEN
 
 					}
 				}
