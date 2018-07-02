@@ -1,0 +1,3 @@
+cd C:\Users\Josh\Documents\Tarea_Programada_#4\TareaProgramadaIV-version_7
+g++ *.cpp -o prueba
+prueba
