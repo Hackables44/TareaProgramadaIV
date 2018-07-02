@@ -239,40 +239,25 @@ public: //se ocupaba hacer un public aqui porque como el iterador es publico su 
 
 				/** método que inserta de forma recursiva en la posicion necesitada */
 				Nodo* insertar(int dato, Nodo* nodo1, Nodo* nodo2, Pila& pila, Iterador& iterador){ /** recibe un dato de tipo T, y los punteros de 2 nodos */
-					Nodo* llave = 0;
+					Nodo* llave = nodo1; /** inicializa el puntero con la referencia  */
 					if(this->dato != dato){ /** se agrega si el dato recibido como parámetro no se ha agregado previamente */
 						/** se decide si ir al lado izquierdo (si el nodo nuevo tiene una llave menor) o derecho (si tiene una llave mayor) */
 						int lado = IZQ; /** se inicializa como para agregar al lado izquierdo del nodo intermedio */
 						if(dato > nodo1->dato){ /** si el dato que se esta agregando es mayor que el del primer nodo; esta condición lleva al lado derecho si es necesario */
 							lado = DER; /** asignación para trabajar sobre el lado derecho */
 						}
-
 						if(nodo1->hijo[lado]){ /** si existe un nodo de dicho lado */
 							//cout << "entro a la condicion" << endl;
 							pila.agregarALaPila(nodo1); /** se agrega a la pila el primer nodo de los 2 ingresados (ya que está más arriba en la jerarquía) */
 							iterador.setPila(pila); /** se indica al iterador el buffer con el que trabajará */
 							++iterador; /** el iterador toma la referencia del último nodo agregado al vector de punteros que funciona como buffer */
-
 							//para metodos de visualizacion
 							cout << "El actual de iterador esta apuntando a " << (*iterador)->dato << endl;
-
-							/**  */
 							 nodo1->hijo[lado] = nodo1->hijo[lado]->insertar(dato, nodo1->hijo[lado], nodo2, pila, iterador); /** método recursivo que vuelve a llamar al metodo insertar con los siguientes nodos a ordenar */
-
 						}
 						else{
-
-							// analizar el caso cuando se creen las 2 primeras hojas
 							llave = crearLlave(nodo1,nodo2); /** se crea el nodo intermedio con su respectiva llave y de una vez le asigna los nodos como hijos */
-
-							//iterador.padre->hijo[lado] = llave;
 						}
-						// la siguiente acción es innecesaria
-						// else{ /** si el nodo no existe */
-							// hijo[lado] = new Nodo(dato); /** se crea el Nodo */
-						//}
-						//pila.buffer[pila.contadorDeNodosAgregados - 2]->hijo[lado] = llave;   //MEJOR IMPLEMENTAR CUANDO YA EL ITERADOR ESTE FUNCIONANDO BIEN
-
 					}
 					return llave;
 				}
@@ -453,7 +438,7 @@ public: //se ocupaba hacer un public aqui porque como el iterador es publico su 
 		 if(raiz){ /** si el árbol tiene una raíz válida */
 			raiz = raiz->insertar(dato, raiz, hoja, pila, iterador); /** se le indica a la raíz del árbol el dato, y los 2 nodos con los cuales generará el nodo intermedio llave (método recursivo) */ //creo que ocupamos psarle tambien la referencio de raiz a este metodo y el nodo tambien se lo estamos pasando por parametro
 		 }
-		 else { /** si el árbol no tiene raíz */
+		 else{ /** si el árbol no tiene raíz */
 			 raiz = hoja; /** la primera raíz es el primer nodo ingresado, cuando se ingrese el siguiente nodo la raíz será un nodo llave */
 			 //pila.agregarALaPila(raiz);  aqui creo que no se agrega porque apenas es la primera hoja agregada no se baja
 		 }
@@ -521,3 +506,4 @@ public: //se ocupaba hacer un public aqui porque como el iterador es publico su 
 // a partir de línea 430, refinamiento del método imprimir de ArbolRN
 //ahora el contador de nodos agregados si se actualiza de forma exitosa por un metodo recursivo y eso hizo tambien innecesario que Nodo tuviera una instancia de Pila
 //ahora el metodo de imprimir pila sirve
+// el método insertar ya sirve !!!!!!!!!!!!!!!!!!!!
