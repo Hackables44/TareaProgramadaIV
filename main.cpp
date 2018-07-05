@@ -1,46 +1,64 @@
 #include "ArbolRN.h"
 #include<iostream>
+#include <string>
 using namespace std;
 
-int main(){
-   int dato = 0;
-   int key = 0;
 
-   ArbolRN<int,int> arbol;
-
+template< class T >
+void seleccionDeTipo(T tipo){
+   ArbolRN<int,T> arbol;
+   int key;
    do{
-      // cout << "Dato:";
-      // cin >> dato;
-      // cout << "Key:";
-	    // cin >> key;
-	    // cout << endl;
-
-
-      /** ingresa los nodos del 4 al 7, para probar la rotación izquierda */
-    //  for(int i=0; i<3; ++i){
-      //  key = i+4;
-      //  dato = key;
-      //  cout << "Ingresa el dato-> Key: " << key << " Dato: " << dato << endl;
-      //  if(key!=-1){
-     	  //   arbol.insertar(key, dato);
-  	     //}
-      //}
 
       /** ingresa los nodos del 7 al 4, para probar la rotación izquierda */
-      
+        cout << "key: ";
         cin >> key ;
-        cin >> dato;
-        cout << "Ingresa el dato-> Key: " << key << " Dato: " << dato << endl;
+        cout << endl;
+        cout << "dato: ";
+        cin >> tipo;
+        cout << endl;
+        cout << "Ingresa el dato-> Key: " << key << " Dato: " << tipo << endl;
         if(key!=-1){
-     	     arbol.insertar(key, dato);
-  	     }
-      
+            arbol.insertar(key, tipo);
+        }
 
-      
+
 
   }while(key != -1);
 
   cout << "Imprime el arbol: \n" << arbol << endl;
+}
+
+int main(){
+  int entero;
+  double real;
+  char letra;
+  string hilera;
+  cout << "ingrese de que tipo quiere que sea el arbol" << endl;
+  cout << "C = char, S = string , I = int , D = double" << endl;
+  char respuesta;
+  cin >> respuesta;
+  cout << "ingrese la llave, tiene que ser Int" << endl;
+  cout << "Ingrese el dato que desea agregar al arbol, que sea del tipo respectivo" << endl;
+  switch(respuesta){
+    case 'C':
+      seleccionDeTipo(letra);
+       break;
+    case 'S':
+      seleccionDeTipo(hilera);
+      break;
+    case 'I':
+      seleccionDeTipo(entero);
+      break;
+    case 'D':
+      seleccionDeTipo(real);
+      break;
+    default:
+      cerr << "WARNING: se digito un char invalido " << endl;
+      break;
+  }
+
+
 
   return 0;
 }
