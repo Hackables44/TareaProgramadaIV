@@ -27,16 +27,16 @@ int main(){
       //}
 
       /** ingresa los nodos del 7 al 4, para probar la rotación izquierda */
-      for(int i=0; i<4; ++i){
-        key = 7-i;
-        dato = key;
+      
+        cin >> key ;
+        cin >> dato;
         cout << "Ingresa el dato-> Key: " << key << " Dato: " << dato << endl;
         if(key!=-1){
      	     arbol.insertar(key, dato);
   	     }
-      }
+      
 
-      key = -1; /** trabaja junto con el for, para salir del while */
+      
 
   }while(key != -1);
 

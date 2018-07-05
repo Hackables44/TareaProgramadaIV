@@ -259,7 +259,8 @@ class Nodo{ /** definición de la clase Nodo */
 
 				arbol.pila.agregarALaPila(nodo1); /** se agrega a la pila el primer nodo de los 2 ingresados (ya que está más arriba en la jerarquía) */
 				// busco que el actual sea nodo intermedio (llave) hijo y no padre
-				//++(arbol.iterador); /** el iterador toma la referencia del último nodo agregado al vector de punteros que funciona como buffer */
+				arbol.iterador.setPila(arbol.pila);
+				++(arbol.iterador); /** el iterador toma la referencia del último nodo agregado al vector de punteros que funciona como buffer */
 
 				// para metodos de visualizacion
 				// cout << "El actual de iterador esta apuntando a " << (*iterador)->key << endl;
@@ -270,8 +271,9 @@ class Nodo{ /** definición de la clase Nodo */
 			else{ /**  */
 				llave = crearLlave(nodo1,nodo2); /** se crea el nodo intermedio con su respectiva llave y de una vez le asigna los nodos como hijos */
 				// quise arreglar lo de que el actual fuera el hijo y no el padre, pero no
-				arbol.pila.agregarALaPila(llave); /** se agrega a la pila el nodo llave (ya que está más arriba en la jerarquía) */
-					++(arbol.iterador); /** el iterador toma la referencia del último nodo agregado al vector de punteros que funciona como buffer */
+				//arbol.pila.agregarALaPila(llave); /** se agrega a la pila el nodo llave (ya que está más arriba en la jerarquía) */
+					//arbol.iterador.setPila(arbol.pila);
+					//++(arbol.iterador); /** el iterador toma la referencia del último nodo agregado al vector de punteros que funciona como buffer */
 				//arbol.imprimirPila();
 
 				cout << "Llave->Key: " << llave->getKey() <<" Color de Llave: " << llave->getColor() <<" Dato: " << llave->getDato() << endl;
@@ -380,7 +382,6 @@ public:
 	/**metodo constructor por omision de la clase ArbolRN*/
 	ArbolRN(){
 		raiz = 0; /**inicializacion de la raiz en nulo*/
-		iterador.setPila(pila); /** se indica al iterador el buffer con el que trabajará */
 	}
 	/**metodo destructor de arbol que mata a la raiz y esta se encarga de matar a sus hijos*/
 	~ArbolRN(){
@@ -397,6 +398,7 @@ public:
 
 	void colorFlip(){ /** recibe el puntero del nodo padre */
 		cout << "Entra al colorFlip" << endl;
+		cout << "El actual seria " << iterador.actual->dato << endl;
 		int ambos = 0; /** */
 		/** si el hijo izquierdo y el hijo derecho son rojos lo almacena en la variable local */
 		if( ('R' == iterador.actual->hijo[IZQ]->getColor()) && ('R' == iterador.actual->hijo[DER]->getColor()) ){
