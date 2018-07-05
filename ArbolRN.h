@@ -9,7 +9,7 @@ using namespace std;
 /** constantes definidas para indicar cual es el hijo izquierdo y el derecho */
 #define IZQ 0
 #define DER 1
-
+template<class T1, class T2>
 class ArbolRN{ /** definición de la clase para hacer el árbol de */
 	/** método friend que imprime los valores en los nodos del árbol de forma recursiva, recibe y devuelve la referencia de un objeto de salida de flujo, junto con la referencia del objeto Arbol	*/
 	friend ostream& operator<<(ostream& salida, ArbolRN& arbol){ /** recibe como parámetro la referencia de un objeto stream y Arbol */
@@ -133,8 +133,8 @@ class ArbolRN{ /** definición de la clase para hacer el árbol de */
 class Nodo{ /** definición de la clase Nodo */
 	public: /** todos sus atributos y métodos son públicos */
 	char color; /** almacena el color Rojo o Negro del Nodo (raíz, nodo intermedio u hoja) */
-	int key; /** llave del nodo, número menor entre 2 nodos */
-	int /** T */ dato; /** almacena el valor según el tipo de dato (T) */
+	T1 key; /** llave del nodo, número menor entre 2 nodos */
+	T2 /** T */ dato; /** almacena el valor según el tipo de dato (T) */
 	Nodo* hijo[2]; /** cada nodo tiene máximo 2 hijos */
 
 	//Pila pila; /** Se crea una instancia de Pila en el stack, el cual utilizará la instancia de la clase Iterador */
@@ -142,15 +142,15 @@ class Nodo{ /** definición de la clase Nodo */
 	/** Constructor por omisión que inicializa los atributos numéricos en 0, el caracter en nulo y punteros en nulo también */
 	Nodo(){ /** constructor sin parámetros */
 		/** inicializa los atributos de la clase dato, key, color y los punteros a los hijos izquierdo y derecho en cero o nulo según corresponda. */
-		dato = 0; /** inicializa dato en 0 */
-		key = 0; /** inicializa la llave en 0 */
+		//dato = 0; /** inicializa dato en 0 */
+		//key = 0; /** inicializa la llave en 0 */
 		color = '\0'; /** inicializa el caracter del color en nulo */
 		hijo[IZQ] = 0; /** inicializa el puntero al hijo izquierdo en nulo */
 		hijo[DER] = 0; /** inicializa el puntero al hijo derecho en nulo */
 	}
 
 	/** Constructor con párametro que se utiliza para crear una hoja */
-	Nodo(int key, int dato){ /** recibe un dato como parámetro */
+	Nodo(T1 key, T2 dato){ /** recibe un dato como parámetro */
 		this->dato = dato; /** asigna como atributo el dato que está entrando */
 		this->key = key; /** asigna como atributo la llave que está entrando */
 		color = 'N'; /** las hojas siempre son de color negro */
@@ -160,10 +160,10 @@ class Nodo{ /** definición de la clase Nodo */
 	}
 
 	/** Constructor con parámetros que se utiliza para la creación de los nodos intermedios del árbol que solo poseen una llave */
-	Nodo(int key){ /** Constructor con parámetros de la clase nodo */  //PUEDE SER QUE NO USEMOS EL PARAMETRO DATO EN ESTE CONSTRUCTOR
+	Nodo(T1 key){ /** Constructor con parámetros de la clase nodo */  //PUEDE SER QUE NO USEMOS EL PARAMETRO DATO EN ESTE CONSTRUCTOR
 		/** inicializa el valor del atributo key con el parámetro key recibido */
 		this->key = key;/** asignamos la llave que entra como parámetro */
-		dato = 0; /** como es un nodo intermedio, solo almacena llave, entonces no asignamos dato */
+		//dato = 0; /** como es un nodo intermedio, solo almacena llave, entonces no asignamos dato */
 		color = 'R'; /** las llaves cuando se crean son de color rojo */
 		/** inicializa los punteros a hijo en nulo, los cuales serán asignados posteriormente mediante el método "crearLlave" según corresponda */
 		hijo[IZQ] = 0; /** inicializa el puntero al hijo izquierdo en nulo */
@@ -207,12 +207,12 @@ class Nodo{ /** definición de la clase Nodo */
 	}
 
 	/** método que realiza una asignacion del dato de la instancia de Nodo */
-	void setDato(int dato){ /** recibe un dato de tipo T como parámetro */
+	void setDato(T2 dato){ /** recibe un dato de tipo T como parámetro */
 		this->dato = dato; /** asignación del dato */
 	}
 
 	/** método que realiza una asignacion de la llave de la instancia de Nodo */
-	void setKey(int key){
+	void setKey(T1 key){
 		this->key = key; /** asignación de la llave */
 	}
 
@@ -222,12 +222,12 @@ class Nodo{ /** definición de la clase Nodo */
 	}
 
 	/** función que devuelve el dato que está guardado en el nodo */
-	int /** T */ getDato(){ /** no necesita parámetro */
+	T2 /** T */ getDato(){ /** no necesita parámetro */
 		return dato; /** retorna el atributo dato */
 	}
 
 	/** función que devuelve el valor de la llave */
-	int getKey(){
+	T1 getKey(){
 		return key; /** retorno del valor del atributo llave */
 	}
 
@@ -236,8 +236,8 @@ class Nodo{ /** definición de la clase Nodo */
 	//this->pila = pila; /** asignación, por referencia para que se trabaje con la misma pila*/ // esta línea está rara
 	//}
 
+	Nodo* insertar(T1 key, Nodo* nodo1, Nodo* nodo2, ArbolRN& arbol){ /** recibe un key de tipo entero, y los punteros de 2 nodos */
 	/** método que inserta de forma recursiva en la posicion necesitada */
-	Nodo* insertar(int key, Nodo* nodo1, Nodo* nodo2, ArbolRN& arbol){ /** recibe un key de tipo entero, y los punteros de 2 nodos */
 		Nodo* llave = nodo1; /** inicializa el puntero con la referencia del nodo que sostiene a los inferiores, así no se perderán las conexiones del árbol */
 		if(this->key != key){ /** se agrega si el key recibido como parámetro no se ha agregado previamente */
 			/** se decide si ir al lado izquierdo (si el nodo nuevo tiene una llave menor) o derecho (si tiene una llave mayor) */
@@ -287,7 +287,7 @@ class Nodo{ /** definición de la clase Nodo */
 	}
 
 	/**metodo que nos dice si un dato existe o no dentro del arbol*/
-	int existe(int dato){
+	int existe(T2 dato){
 		int esta = 0; /**inicializacion de la variable que se va a devolver, en este caso toma el valor de 0(no esta) por defecto*/
 		if(this->dato!=dato){ /**condicion que realiza la comparacion entre el dato actual y el que se esta ingresando, si son iguales no entra*/
 			int lado = IZQ; /**asumimos que vamos a ir hacia el lado izquierdo*/
@@ -566,7 +566,7 @@ public:
 	}
 
 	/** el método público insertar de la clase ArbolRN recibe como parámetro la llave y el dato de tipo T que corresponderán al nodo hoja */
-	void insertar(int key, int dato){
+	void insertar(T1 key, T2 dato){
 		Nodo* hoja = new Nodo(key,dato); /** crea en el heap un nodo hoja con los parámetros recibidos y guarda su referencia */
 		//cout << "Color de Hoja: " << hoja->getColor()<< endl;
 		if(raiz){ /** si el árbol tiene una raíz válida */
@@ -621,7 +621,7 @@ public:
 	}
 
 	/** método que verifica si el dato ingresado como parámetro existe en el árbol, llama recursivamente al método existe de los nodos */
-	int existe(int dato){ /** recibe un dato de tipo T como parámetro */
+	int existe(T2 dato){ /** recibe un dato de tipo T como parámetro */
 		int esta = 0; /** inicializamos la variable en 0, como si no estuviera el dato en el árbol */
 		if(raiz){ /** si existe la raíz, entra */
 			esta = raiz->existe(dato); /** esta almacena si existe el dato, llamado al metodo existe del nodo */

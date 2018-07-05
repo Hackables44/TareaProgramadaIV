@@ -6,7 +6,7 @@ int main(){
    int dato = 0;
    int key = 0;
 
-   ArbolRN arbol;
+   ArbolRN<int,int> arbol;
 
    do{
       // cout << "Dato:";
